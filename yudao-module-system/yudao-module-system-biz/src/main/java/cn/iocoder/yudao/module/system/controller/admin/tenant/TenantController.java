@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.system.service.tenant.TenantService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +25,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.operatelog.core.enums.OperateTypeEnum.EXPORT;
 
+@Slf4j
 @Api(tags = "管理后台 - 租户")
 @RestController
 @RequestMapping("/system/tenant")
@@ -37,6 +39,7 @@ public class TenantController {
     @ApiOperation(value = "使用租户名，获得租户编号", notes = "登录界面，根据用户的租户名，获得租户编号")
     @ApiImplicitParam(name = "name", value = "租户名", required = true, example = "1024", dataTypeClass = Long.class)
     public CommonResult<Long> getTenantIdByName(@RequestParam("name") String name) {
+        log.info("登录界面，根据用户的租户名，获得租户编号");
         TenantDO tenantDO = tenantService.getTenantByName(name);
         return success(tenantDO != null ? tenantDO.getId() : null);
     }
@@ -76,7 +79,8 @@ public class TenantController {
 
     @GetMapping("/page")
     @ApiOperation("获得租户分页")
-    @PreAuthorize("@ss.hasPermission('system:tenant:query')")
+    @PermitAll
+//    @PreAuthorize("@ss.hasPermission('system:tenant:query')")
     public CommonResult<PageResult<TenantRespVO>> getTenantPage(@Valid TenantPageReqVO pageVO) {
         PageResult<TenantDO> pageResult = tenantService.getTenantPage(pageVO);
         return success(TenantConvert.INSTANCE.convertPage(pageResult));
